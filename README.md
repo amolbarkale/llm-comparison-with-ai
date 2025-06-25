@@ -1,4 +1,4 @@
-# HF Model Comparator CLI
+# Hugging Face Model Comparator CLI
 
 A simple command-line tool to compare Base, Instruct, and Fine-tuned Hugging Face language models. Generate text responses and view basic model characteristics (architecture, context window).
 
@@ -116,11 +116,17 @@ When finished, deactivate the virtual environment:
 deactivate
 ```
 
-Interactive model selection: prompt the user to choose among all models in a category.
+Comparisons document: Observe outputs for diverse prompts in a comparisons.md file with commentary on model appropriateness.
 
-Token-usage visualization: integrate an ASCII bar chart or use Rich.
+## Sample prompts to test
 
-Comparisons document: capture outputs for at least 5 diverse prompts in a comparisons.md file with commentary on model appropriateness.
+```
+python model_comparator.py --prompt "Hello, what's your favorite hobby?" --category base
+python model_comparator.py --prompt "Translate to Spanish: Artificial intelligence is transforming the world." --category instruct
+python model_comparator.py --prompt "Explain in simple terms: What is a blockchain?" --category instruct
+python model_comparator.py --prompt "Write a Shakespearean sonnet about the autumn breeze." --category fine-tuned
+python model_comparator.py --prompt "Outline the main steps to set up a Python virtual environment." --category fine-tuned
+```
 
 ---
 

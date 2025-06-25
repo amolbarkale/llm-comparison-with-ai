@@ -20,7 +20,7 @@ INSTRUCT_MODELS = [
     "google/flan-t5-large"          # instruction-tuned T5 large
 ]
 FINETUNED_MODELS = [
-    "akiyamat/gpt2-shakespeare",    # GPT2 fine-tuned on Shakespeare
+    "sadia72/gpt2-shakespeare",    # GPT2 fine-tuned on Shakespeare
     "sshleifer/distilbart-cnn-12-6",# DistilBART fine-tuned on CNN/DailyMail
     "allenai/unifiedqa-t5-small"    # UnifiedQA fine-tuned T5 small
 ]
@@ -133,7 +133,7 @@ def compare(
     gen = get_pipeline(chosen_model)
 
     # Generate text (limit tokens to keep inference quick)
-    result = gen(prompt, max_new_tokens=50)[0]["generated_text"]
+    result = gen(prompt, max_new_tokens=50, return_full_text=False)[0]["generated_text"]
 
     typer.echo("\n--- Response ---")
     typer.echo(result)

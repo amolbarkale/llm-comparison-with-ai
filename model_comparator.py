@@ -2,6 +2,7 @@
 # A simple CLI tool to compare Base, Instruct, and Fine-tuned HF models
 
 import os
+from typing import Optional
 from dotenv import load_dotenv
 import typer
 from transformers import pipeline, AutoConfig
@@ -68,13 +69,21 @@ def summarize_characteristics(model_name: str, category: str) -> str:
 def compare(
     prompt: str = typer.Option(..., "-p", "--prompt", help="The user query to generate against"),
     category: str = typer.Option(..., "-c", "--category",
-                                help="Model category: base | instruct | fine-tuned")
+                                help="Model category: base | instruct | fine-tuned"),
+    model_name: Optional[str] = typer.Option(
+        None,
+        "-m",
+        "--model",
+        help="(Optional) Specific model name to use instead of default for the category"
+    )
 ):
     """
     Run the prompt through a chosen category of LLM and show output + summary.
+
+    If --model is provided, that model will be used (must be a valid HF model identifier).
+    Otherwise, the first model in the chosen category list is used.
     """
     load_dotenv()  # for HUGGINGFACE_TOKEN if needed
-    # optional HF login for private models
     hf_token = os.environ.get("HUGGINGFACE_TOKEN")
     if hf_token:
         huggingface_hub.login(token=hf_token)
@@ -90,12 +99,16 @@ def compare(
         typer.echo("Invalid category: choose base | instruct | fine-tuned")
         raise typer.Exit(code=1)
 
-    # For simplicity, pick the first model in the list
-    model_name = models[0]
+    # Determine which model to use
+    chosen_model = model_name if model_name else models[0]
+    if model_name and model_name not in models:
+        typer.echo(
+            f"Warning: '{model_name}' is not a default model for category '{category}', but will be used."
+        )
 
-    typer.echo(f"\n→ Using model: {model_name} (category: {category})")
-    typer.echo(f"   Loading generation pipeline…")
-    gen = get_pipeline(model_name)
+    typer.echo(f"\n→ Using model: {chosen_model} (category: {category})")
+    typer.echo("   Loading generation pipeline…")
+    gen = get_pipeline(chosen_model)
 
     # Generate text (limit tokens to keep inference quick)
     result = gen(prompt, max_new_tokens=50)[0]["generated_text"]
@@ -104,7 +117,7 @@ def compare(
     typer.echo(result)
 
     # Summarize characteristics
-    summary = summarize_characteristics(model_name, category)
+    summary = summarize_characteristics(chosen_model, category)
     typer.echo("\n--- Model Summary ---")
     typer.echo(summary)
 

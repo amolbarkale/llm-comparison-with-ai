@@ -1,8 +1,8 @@
 # model_comparator.py
 # A simple CLI tool to compare Base, Instruct, and Fine-tuned HF models
-
 import os
 from typing import Optional
+from pathlib import Path
 from dotenv import load_dotenv
 import typer
 from transformers import pipeline, AutoConfig
@@ -11,13 +11,13 @@ import huggingface_hub
 # 1. Define free HF models for each category
 BASE_MODELS = [
     "gpt2",                         # 117M parameters
-    "EleutherAI/gpt-neo-125M",     # 125M parameters
-    "facebook/opt-125m"            # 125M parameters
+    "EleutherAI/gpt-neo-125M",      # 125M parameters
+    "facebook/opt-125m"             # 125M parameters
 ]
 INSTRUCT_MODELS = [
-    "google/flan-t5-small",        # instruction-tuned T5 small
-    "google/flan-t5-base",         # instruction-tuned T5 base
-    "google/flan-t5-large"         # instruction-tuned T5 large
+    "google/flan-t5-small",         # instruction-tuned T5 small
+    "google/flan-t5-base",          # instruction-tuned T5 base
+    "google/flan-t5-large"          # instruction-tuned T5 large
 ]
 FINETUNED_MODELS = [
     "akiyamat/gpt2-shakespeare",    # GPT2 fine-tuned on Shakespeare
@@ -26,7 +26,6 @@ FINETUNED_MODELS = [
 ]
 
 app = typer.Typer(help="Compare and summarize HF LLM models")
-
 
 def get_pipeline(model_name: str):
     """
@@ -37,7 +36,6 @@ def get_pipeline(model_name: str):
         model=model_name,
         device=0 if os.getenv("CUDA_VISIBLE_DEVICES") else -1
     )
-
 
 def get_metadata(model_name: str) -> dict:
     """
@@ -52,18 +50,42 @@ def get_metadata(model_name: str) -> dict:
         "context_window": context_window
     }
 
-
 def summarize_characteristics(model_name: str, category: str) -> str:
     """
     Build a short, human-readable summary of the model.
     """
     meta = get_metadata(model_name)
-    summary = (
+    return (
         f"A {category} model of type {meta['architecture']} "
         f"with a {meta['context_window']}-token context window."
     )
-    return summary
 
+def append_comparison_row(
+    prompt: str,
+    category: str,
+    model_name: str,
+    metadata: dict,
+    response: str,
+    file_path: Path = Path("comparisons.md")
+):
+    """
+    Append a row to comparisons.md with the given columns.
+    Creates the file with header if it doesn't exist.
+    """
+    header = "| Prompt | Category | Model | Architecture | Context Window | Response |\n"
+    separator = "|---|---|---|---|---|---|\n"
+    # Ensure the comparisons file exists and has header
+    if not file_path.exists() or file_path.stat().st_size == 0:
+        file_path.write_text(header + separator, encoding="utf-8")
+    # Escape any '|' in prompt/response
+    safe_prompt = prompt.replace("|", "\\|")
+    safe_response = response.replace("|", "\\|").replace("\n", " ")
+    # Build row
+    row = (
+        f"| `{safe_prompt}` | {category} | `{model_name}` | "
+        f"{metadata['architecture']} | {metadata['context_window']} | `{safe_response}` |\n"
+    )
+    file_path.open("a", encoding="utf-8").write(row)
 
 @app.command()
 def compare(
@@ -117,10 +139,13 @@ def compare(
     typer.echo(result)
 
     # Summarize characteristics
+    metadata = get_metadata(chosen_model)
     summary = summarize_characteristics(chosen_model, category)
     typer.echo("\n--- Model Summary ---")
     typer.echo(summary)
 
+    # Append this run to comparisons.md
+    append_comparison_row(prompt, category, chosen_model, metadata, result)
 
 if __name__ == "__main__":
     app()

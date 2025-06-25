@@ -75,7 +75,7 @@ A simple command-line tool to compare Base, Instruct, and Fine-tuned Hugging Fac
 
 ## Usage
 
-Run the CLI with your prompt, a model category, and optionally specify a model name:
+Run the CLI with your prompt, a model category, and optionally specify a model name using single-line commands:
 
 ```bash
 # Use default model for the 'base' category
@@ -116,15 +116,11 @@ When finished, deactivate the virtual environment:
 deactivate
 ```
 
----
+Interactive model selection: prompt the user to choose among all models in a category.
 
-## Next Steps
+Token-usage visualization: integrate an ASCII bar chart or use Rich.
 
-* **Add more models** by updating the `BASE_MODELS`, `INSTRUCT_MODELS`, and `FINETUNED_MODELS` lists in `model_comparator.py`.
-* **Interactive model selection**: prompt the user to choose among all models in a category.
-* **Token-usage visualization**: integrate an ASCII bar chart or use [Rich](https://github.com/Textualize/rich).
-* **Comparisons document**: capture outputs for at least 5 diverse prompts in a `comparisons.md` file with commentary on model appropriateness.
+Comparisons document: capture outputs for at least 5 diverse prompts in a comparisons.md file with commentary on model appropriateness.
 
 ---
 
-*Happy comparing!*

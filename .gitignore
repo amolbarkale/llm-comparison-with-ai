@@ -1,0 +1,57 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+.env
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Editors
+.vscode/        # VS Code
+.idea/          # PyCharm/IntelliJ IDEA
+*.sublime-project
+*.sublime-workspace
+.DS_Store       # macOS specific
+Thumbs.db       # Windows specific
+
+# Jupyter Notebook / IPython
+.ipynb_checkpoints
+profile_default/
+ipython_config.py
+
+# Pytest cache
+.pytest_cache/
+
+# Sphinx documentation
+docs/_build/
+
+# IDE specific files
+*.swp # Vim swap files
+*.bak # Backup files
+*.swo
+
+# Temporary files
+*.tmp
+*.sqlite3 # SQLite databases
+
+# Miscellaneous
+.env            # Environment variables file
+.flaskenv       # Flask environment variables
+instance/       # Flask instance folder
+celerybeat-schedule # Celery beat schedule file
+trained_model/  
